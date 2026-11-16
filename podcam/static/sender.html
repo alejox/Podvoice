@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Podcam</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px system-ui, sans-serif; background: #000; color: #eee; }
+  video { width: 100vw; height: 70vh; object-fit: contain; background: #111; display: block; }
+  .bar { padding: 12px 16px; display: grid; gap: 10px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  select, button { font: inherit; padding: 10px 12px; border-radius: 10px; border: 1px solid #444;
+                   background: #1c1c1c; color: #eee; flex: 1; min-width: 0; }
+  button.main { background: #e5484d; border-color: #e5484d; color: #fff; font-weight: 600; }
+  #status { font-size: 14px; color: #aaa; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #666; margin-right: 6px; }
+  .on { background: #30a46c; }
+</style>
+</head>
+<body>
+<video id="preview" autoplay playsinline muted></video>
+<div class="bar">
+  <div class="row">
+    <select id="facing"><option value="environment">Camara trasera</option><option value="user">Camara frontal</option></select>
+    <select id="res"><option value="720">720p</option><option value="1080" selected>1080p</option><option value="480">480p</option></select>
+  </div>
+  <div class="row">
+    <button id="start" class="main">Iniciar</button>
+    <button id="mic">Microfono: si</button>
+  </div>
+  <div id="status"><span class="dot" id="dot"></span><span id="msg">Listo para iniciar</span></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+let stream = null, pc = null, gen = 0, running = false;
+
+function status(text, ok) { $("msg").textContent = text; $("dot").className = "dot" + (ok ? " on" : ""); }
+
+async function getMedia() {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  const h = +$("res").value;
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: $("facing").value, height: { ideal: h }, width: { ideal: Math.round(h * 16 / 9) },
+             frameRate: { ideal: 30 } },
+    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+  });
+  stream.getAudioTracks().forEach(t => t.enabled = $("mic").dataset.off !== "1");
+  $("preview").srcObject = stream;
+}
+
+function waitIce(pc) {
+  if (pc.iceGatheringState === "complete") return Promise.resolve();
+  return new Promise(res => {
+    const done = () => { if (pc.iceGatheringState === "complete") res(); };
+    pc.addEventListener("icegatheringstatechange", done);
+    setTimeout(res, 3000);  // en red local no hace falta esperar mas
+  });
+}
+
+async function api(path, body) {
+  const r = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" },
+                                       body: JSON.stringify(body) } : {});
+  return { code: r.status, data: await r.json() };
+}
+
+async function negotiate(g) {
+  if (pc) pc.close();
+  pc = new RTCPeerConnection({ iceServers: [] });
+  stream.getTracks().forEach(t => pc.addTrack(t, stream));
+  // Mas bitrate para video de calidad en red local.
+  pc.getSenders().forEach(s => {
+    if (s.track.kind !== "video") return;
+    const p = s.getParameters(); p.encodings = p.encodings && p.encodings.length ? p.encodings : [{}];
+    p.encodings[0].maxBitrate = 8_000_000; p.degradationPreference = "maintain-resolution";
+    s.setParameters(p).catch(() => {});
+  });
+  pc.onconnectionstatechange = () => {
+    const s = pc.connectionState;
+    status(s === "connected" ? "Transmitiendo al PC" : "Conexion: " + s, s === "connected");
+  };
+  await pc.setLocalDescription(await pc.createOffer());
+  await waitIce(pc);
+  const r = await api("/api/offer", { gen: g, type: "offer", sdp: pc.localDescription.sdp });
+  if (r.code !== 200) return;
+  status("Esperando respuesta del PC...");
+  for (let i = 0; i < 60 && g === gen; i++) {
+    const a = await api("/api/answer?gen=" + g);
+    if (a.code === 200) { await pc.setRemoteDescription({ type: "answer", sdp: a.data.sdp }); return; }
+    await new Promise(r => setTimeout(r, 500));
+  }
+}
+
+async function loop() {
+  while (running) {
+    try {
+      const { data } = await api("/api/state");
+      if (data.gen > 0 && data.gen !== gen) { gen = data.gen; negotiate(gen).catch(e => status("Error: " + e.message)); }
+      else if (!data.viewer && (!pc || pc.connectionState !== "connected")) status("Esperando al visor en el PC...");
+    } catch (e) { status("Sin conexion con el PC"); }
+    await new Promise(r => setTimeout(r, 1000));
+  }
+}
+
+$("start").onclick = async () => {
+  if (running) {
+    running = false; gen = 0; if (pc) pc.close(); pc = null;
+    stream && stream.getTracks().forEach(t => t.stop()); stream = null;
+    $("start").textContent = "Iniciar"; status("Detenido"); return;
+  }
+  if (!navigator.mediaDevices || !window.isSecureContext) {
+    status("La camara requiere HTTPS (WiFi) o localhost (USB)."); return;
+  }
+  try { await getMedia(); } catch (e) { status("Sin acceso a camara/micro: " + e.message); return; }
+  running = true; $("start").textContent = "Detener";
+  try { gen = (await api("/api/reset", {})).data.gen; negotiate(gen).catch(e => status("Error: " + e.message)); } catch (e) {}
+  loop();
+  try { await navigator.wakeLock?.request("screen"); } catch (e) {}
+};
+
+async function restartMedia() {
+  if (!running) return;
+  await getMedia();
+  // Cambia las pistas sin renegociar.
+  if (pc) for (const s of pc.getSenders()) {
+    const t = stream.getTracks().find(t => t.kind === s.track?.kind);
+    if (t) await s.replaceTrack(t);
+  }
+}
+$("facing").onchange = $("res").onchange = () => restartMedia().catch(e => status("Error: " + e.message));
+$("mic").onclick = () => {
+  const off = $("mic").dataset.off !== "1";
+  $("mic").dataset.off = off ? "1" : "0"; $("mic").textContent = "Microfono: " + (off ? "no" : "si");
+  stream && stream.getAudioTracks().forEach(t => t.enabled = !off);
+};
+</script>
+</body>
+</html>

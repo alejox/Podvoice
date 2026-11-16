@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Podcam visor</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+  video { width: 100%; height: 100%; object-fit: contain; display: block; }
+  #hud { position: fixed; left: 12px; bottom: 12px; font: 14px system-ui, sans-serif; color: #ccc;
+         background: rgba(0,0,0,.6); padding: 6px 10px; border-radius: 8px; }
+  #unmute { position: fixed; right: 12px; bottom: 12px; font: 14px system-ui, sans-serif; display: none;
+            padding: 8px 12px; border-radius: 8px; border: 0; background: #e5484d; color: #fff; cursor: pointer; }
+  .hide { display: none; }
+</style>
+</head>
+<body>
+<video id="v" autoplay playsinline></video>
+<div id="hud">Conectando...</div>
+<button id="unmute">Activar audio</button>
+<script>
+// ?hud=0 oculta el texto de estado (util en OBS). ?audio=0 silencia.
+const q = new URLSearchParams(location.search);
+const v = document.getElementById("v"), hud = document.getElementById("hud"), btn = document.getElementById("unmute");
+v.muted = q.get("audio") === "0";
+let pc = null, gen = 0;
+
+function say(t) { hud.textContent = t; hud.classList.toggle("hide", q.get("hud") === "0"); }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function api(path, body) {
+  const r = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" },
+                                       body: JSON.stringify(body) } : {});
+  return { code: r.status, data: await r.json() };
+}
+function waitIce(pc) {
+  if (pc.iceGatheringState === "complete") return Promise.resolve();
+  return new Promise(res => { pc.addEventListener("icegatheringstatechange",
+    () => pc.iceGatheringState === "complete" && res()); setTimeout(res, 3000); });
+}
+
+async function connect(g) {
+  if (pc) { pc.onconnectionstatechange = null; pc.close(); pc = null; }
+  gen = g || (await api("/api/join", {})).data.gen;
+  let my = gen;
+  say("Esperando al celular...");
+  let offer = null;
+  while (!offer && my === gen) {
+    const r = await api("/api/offer?gen=" + my);
+    if (r.code === 200) offer = r.data;
+    else if (r.data.gen > my) { gen = my = r.data.gen; }  // el celular se reinicio
+    else { say(r.data.sender ? "Celular encontrado, negociando..." : "Esperando al celular..."); await sleep(500); }
+  }
+  pc = new RTCPeerConnection({ iceServers: [] });
+  pc.ontrack = e => {
+    v.srcObject = e.streams[0];
+    v.play().catch(() => { v.muted = true; v.play(); btn.style.display = "block"; });
+  };
+  pc.onconnectionstatechange = () => {
+    const s = pc.connectionState;
+    say(s === "connected" ? "Conectado" : "Conexion: " + s);
+    if (s === "connected" && q.get("hud") !== "0") setTimeout(() => hud.classList.add("hide"), 2000);
+    if (s === "failed" || s === "disconnected" || s === "closed") setTimeout(retry, 2000);
+  };
+  await pc.setRemoteDescription({ type: "offer", sdp: offer.sdp });
+  await pc.setLocalDescription(await pc.createAnswer());
+  await waitIce(pc);
+  await api("/api/answer", { gen: my, type: "answer", sdp: pc.localDescription.sdp });
+}
+
+// Si el celular se reinicia, sube "gen": nos reconectamos sin esperar a que caiga la conexion.
+setInterval(async () => {
+  try {
+    const { data } = await api("/api/state?role=viewer");
+    if (data.gen > gen && !retrying) { retrying = true; try { await connect(data.gen); } finally { retrying = false; } }
+  } catch (e) {}
+}, 1000);
+
+let retrying = false;
+async function retry() {
+  if (retrying || (pc && pc.connectionState === "connected")) return;
+  retrying = true;
+  try { await connect(); } catch (e) { say("Error: " + e.message + " (reintentando)"); await sleep(2000); retrying = false; return retry(); }
+  retrying = false;
+}
+btn.onclick = () => { v.muted = false; btn.style.display = "none"; };
+retry();
+</script>
+</body>
+</html>

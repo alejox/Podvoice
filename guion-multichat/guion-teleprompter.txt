@@ -1,0 +1,332 @@
+AC MULTICHAT — GUION PARA TELEPROMPTER
+(texto limpio para leer de corrido)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+GANCHO
+
+¿Haces directo en Twitch, YouTube, Kick o TikTok…
+y te toca tener cinco pestañas abiertas
+para no perderte ningún mensaje?
+
+Eso se acabó.
+
+Hoy te traigo AC Multichat, ya en su versión 2.3,
+y viene cargadísimo de cosas nuevas.
+
+Todos tus chats juntos, en un solo lugar,
+dentro de OBS y en tu pantalla.
+
+Gratis. Sin cuentas. Sin claves raras. Sin nada.
+
+Quédate, porque al final te enseño a instalarlo en dos minutos.
+
+¡Vamos!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+¿QUÉ ES ESTO?
+
+Mira, la idea es súper sencilla.
+
+Multichat es un complemento para OBS.
+Lo instalas una vez, y listo.
+
+Junta los chats de Twitch, YouTube, Kick, TikTok y Starvios
+en una sola ventanita dentro de OBS.
+
+Cada mensaje trae el logo de su plataforma,
+así sabes al toque de dónde viene cada persona.
+
+Y lo mejor:
+cuando le das a "Iniciar transmisión",
+Multichat se da cuenta solito
+de en qué plataformas estás en vivo…
+y conecta solo esos chats.
+
+Tú no tienes que hacer nada.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+LO NUEVO — NÚMERO UNO: LA VENTANA FLOTANTE
+
+Ok, ahora sí, lo nuevo.
+Y arranco con mi favorita.
+
+¿Tienes un solo monitor?
+¿Juegas en pantalla completa
+y no ves el chat ni de casualidad?
+
+Pues ahora puedes sacar el chat
+en una ventanita flotante,
+transparente,
+que se queda siempre encima del juego.
+
+La mueves a donde quieras,
+la haces más grande o más pequeña,
+y la próxima vez se abre justo donde la dejaste.
+
+¿Te estorba el mouse?
+Le das clic derecho, marcas
+"Los clics atraviesan la ventana"…
+y el mouse pasa directo al juego,
+como si la ventana no existiera.
+
+Y ojo con esto, que está buenísimo:
+esa ventanita NO sale en tu directo.
+Solo la ves tú.
+Tu público ve tu escena limpia,
+y tú tienes el chat ahí, en tu cara.
+
+Además ahora puedes elegir
+cómo se ve la ventana por separado:
+en vertical, en horizontal,
+con fecha y hora o sin ella…
+
+Y hay una opción nueva que se llama
+"Chat limpio, sin fondos".
+Así, aunque en tu escena tengas un estilo muy cargado,
+en tu ventanita ves solo el texto, limpio y fácil de leer.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NÚMERO DOS: NUEVO ESTILO GTA 6
+
+Número dos.
+Para los que les gusta que el chat se vea bonito…
+
+Llegó un estilo nuevo inspirado en GTA 6.
+Vice City total.
+Colores de atardecer, rosados, morados… una locura.
+
+Y se suma a todos los que ya había:
+cristal, neón, cyberpunk, synthwave, retro, glitch,
+estilo ventana de Mac, y varios más.
+
+Y si no te quieres complicar,
+hay preajustes de un solo clic:
+Limpio, Neón, Burbujas, Alto contraste…
+y uno especial para cuando transmites en vertical.
+
+Un clic, y ya tienes un chat que se ve pro.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NÚMERO TRES: MENSAJE DESTACADO CON PAUSA
+
+Número tres.
+¿Sabes cuando alguien escribe algo épico
+y quieres ponerlo en grande en pantalla?
+
+Le das clic al mensaje… y ¡pum!
+Aparece en grande, con su nombre, su logo y todo.
+
+Antes se quitaba solo al ratito.
+Ahora tienes un botón de pausa:
+lo dejas en pantalla todo el tiempo que quieras,
+y cuando termines, lo quitas.
+
+Perfecto para leer preguntas con calma
+o para presumir una donación.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NÚMERO CUATRO: QUE TE LEA EL CHAT EN VOZ ALTA
+
+Número cuatro.
+Multichat te puede leer el chat en voz alta.
+
+Así no tienes que estar mirando la pantalla todo el rato.
+
+Ahora es más fácil que nunca:
+una sola casilla, y suena en todas tus escenas.
+Nada de andar agregando cosas a cada escena.
+
+Eliges la voz, qué tan rápido habla,
+si dice el nombre de quien escribió,
+y de qué plataformas quieres que lea.
+
+¿Y si no quieres que te lea todo?
+Puedes ponerle solo un sonidito
+cada vez que llega un mensaje.
+Hasta puedes poner tu propio sonido.
+
+Y tranqui:
+no lee los emojis,
+no lee los links,
+y si un moderador borra un mensaje,
+ese mensaje no se lee.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NÚMERO CINCO: TODO MÁS ORDENADO Y MÁS FÁCIL
+
+Y número cinco: todo está más ordenado.
+
+Las opciones ahora van en el orden
+de lo que más vas a cambiar:
+primero el estilo, después el texto,
+después el diseño…
+y lo más avanzado queda escondidito
+para que no te maree.
+
+La fecha y la hora ahora también
+las puedes poner junto al chat,
+o donde tú quieras en la escena.
+
+Y la primera vez que lo abres
+te aparece un asistente
+que te lleva de la mano:
+pones tu canal,
+un botón te pone el chat en la escena…
+y listo. Literal, en un minuto.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+LO QUE YA TRAÍA (Y SIGUE BRUTAL)
+
+Y ojo, que esto se suma a todo lo que ya tenía:
+
+Ves cuántas personas te están viendo
+en cada plataforma, y el total.
+
+Si un moderador borra un mensaje o banea a alguien,
+desaparece también de tu chat en pantalla.
+
+Puedes ocultar bots, comandos
+y palabras que no quieras ver.
+
+Hay mensajes de prueba
+para que acomodes todo
+sin tener que estar en vivo.
+
+Y ya no tienes que estar pendiente de bajar versiones nuevas:
+cuando sale una actualización,
+OBS te avisa,
+le das a "Actualizar ahora",
+y él solito la instala.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CÓMO INSTALARLO
+
+Bueno, ahora sí. ¿Cómo lo instalas?
+
+Lo primero:
+necesitas OBS versión 33 o más nueva.
+Si tienes uno más viejito, actualízalo primero.
+
+Lo segundo:
+el link de descarga te lo dejo aquí abajo,
+en la descripción.
+
+Entras, y descargas el archivo de tu sistema:
+Windows, Mac o Linux.
+
+Y muy importante:
+cierra OBS antes de instalar.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EN WINDOWS
+
+Si estás en Windows:
+
+Uno. Descomprimes el archivo que bajaste.
+Clic derecho, "Extraer todo".
+Te queda una carpeta que se llama "obs-multichat".
+
+Dos. Abres el explorador de archivos,
+y arriba, en la barra, escribes esto:
+C, dos puntos, barra, ProgramData, barra, obs-studio, barra, plugins.
+
+Si la carpeta "plugins" no existe, la creas.
+
+Tres. Copias ahí la carpeta "obs-multichat".
+Windows te va a pedir permiso. Le dices que sí.
+
+Cuatro. Abres OBS.
+
+¡Y ya! Así de fácil.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EN MAC
+
+Si estás en Mac:
+
+Descomprimes el archivo,
+y lo copias en la carpeta de plugins de OBS.
+Te dejo la ruta exacta en la descripción.
+
+Luego abres la Terminal,
+pegas un comando que también te dejo abajo,
+y le das Enter.
+Eso es solo para que el Mac no lo bloquee.
+
+Abres OBS, y listo.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+EN LINUX
+
+Y si eres de Linux…
+tú ya sabes cómo es esto. 😄
+
+Copias los dos comandos de la descripción,
+los pegas en la terminal,
+y abres OBS.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PRIMEROS PASOS
+
+Cuando abras OBS por primera vez,
+te sale el asistente.
+
+Eliges tu plataforma,
+escribes el nombre de tu canal…
+y mira, te sale tu foto de perfil
+para que confirmes que es el canal correcto.
+
+Le das al botón para poner el chat en tu escena,
+si quieres, activas que te lea el chat en voz alta…
+y terminas.
+
+¿Quieres agregar más plataformas?
+Vas a Herramientas, Multichat,
+y agregas todos los canales que quieras.
+
+Y si quieres probar cómo se ve sin estar en vivo,
+activas los mensajes de prueba,
+y te llena el chat de mensajes de ejemplo.
+
+¿Y la ventana flotante?
+Clic derecho en la fuente de Multichat, Propiedades,
+bajas hasta "Ventana flotante",
+y marcas la casilla.
+
+Eso es todo.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CIERRE
+
+Y eso fue AC Multichat 2.3.
+
+Todos tus chats en un solo lugar,
+una ventanita flotante para jugar con un solo monitor,
+estilos para que tu chat se vea increíble,
+y que hasta te lo lea en voz alta.
+
+Todo gratis.
+
+Si te sirvió, déjame tu like,
+suscríbete,
+y cuéntame en los comentarios
+qué quieres que le agregue en la próxima versión.
+Yo los leo todos… bueno, Multichat me los lee. 😄
+
+El link de descarga está en la descripción.
+
+¡Nos vemos en el próximo video!

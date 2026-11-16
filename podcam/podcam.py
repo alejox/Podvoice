@@ -9,6 +9,10 @@ Solo libreria estandar de Python (3.8+). Funciona igual en Windows, macOS y Linu
 Celular (WiFi):  abre https://<IP-del-PC>:8443  (acepta el certificado local)
 Celular (USB, Android):  adb reverse tcp:8080 tcp:8080  y abre http://localhost:8080
 PC / OBS:  http://localhost:8080/viewer  (en OBS: Fuente de navegador -> Camara Virtual)
+
+App Android nativa (podcam/android):
+  python3 podcam.py usb [--play]   # adb forward tcp:4747 + URL para OBS
+  python3 podcam.py wifi IP [--play]
 """
 import argparse
 import json
@@ -158,7 +162,62 @@ def serve(server):
         print(f"[podcam] servidor detenido: {e}")
 
 
+APP_PORT = 4747
+
+
+def find_adb():
+    adb = shutil.which("adb")
+    if adb:
+        return adb
+    for base in (os.environ.get("ANDROID_HOME"), os.environ.get("ANDROID_SDK_ROOT"),
+                 str(Path.home() / "Library/Android/sdk"), str(Path.home() / "Android/Sdk"),
+                 str(Path(os.environ.get("LOCALAPPDATA", "")) / "Android/Sdk")):
+        if base:
+            for name in ("adb", "adb.exe"):
+                p = Path(base) / "platform-tools" / name
+                if p.exists():
+                    return str(p)
+    return None
+
+
+def native_app(mode, ip=None, play=False):
+    """Conecta con la app Android nativa (flujo MPEG-TS por TCP)."""
+    if mode == "usb":
+        adb = find_adb()
+        if not adb:
+            sys.exit("No se encontro adb. Instala 'Android SDK Platform-Tools' y agregalo al PATH.")
+        r = subprocess.run([adb, "forward", f"tcp:{APP_PORT}", f"tcp:{APP_PORT}"], capture_output=True, text=True)
+        if r.returncode != 0:
+            sys.exit("adb forward fallo: " + (r.stderr.strip() or r.stdout.strip()) +
+                     "\n  Conecta el celular por USB, activa 'Depuracion USB' y acepta el aviso en el celular.")
+        url = f"tcp://127.0.0.1:{APP_PORT}"
+    else:
+        url = f"tcp://{ip}:{APP_PORT}"
+    print(f"\n  Flujo de la app:  {url}\n")
+    print("  OBS: Fuente > Fuente multimedia (Media Source)")
+    print("       - desmarca 'Archivo local'")
+    print(f"       - Entrada: {url}")
+    print("       - Formato de entrada: mpegts")
+    print("       - marca 'Reiniciar la reproduccion cuando la fuente se active' y baja el bufer de red a 0-1 MB")
+    print("       Luego 'Iniciar camara virtual'.")
+    print(f"  VLC:  Medio > Abrir ubicacion de red > {url}\n")
+    if play:
+        ffplay = shutil.which("ffplay")
+        if not ffplay:
+            sys.exit("ffplay no esta instalado (viene con FFmpeg).")
+        subprocess.run([ffplay, "-fflags", "nobuffer", "-flags", "low_delay", "-framedrop",
+                        "-window_title", "Podcam", url])
+
+
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] in ("usb", "wifi"):
+        ap = argparse.ArgumentParser(prog="podcam.py " + sys.argv[1])
+        if sys.argv[1] == "wifi":
+            ap.add_argument("ip", help="IP del celular que muestra la app")
+        ap.add_argument("--play", action="store_true", help="ver el video con ffplay")
+        a = ap.parse_args(sys.argv[2:])
+        return native_app(sys.argv[1], getattr(a, "ip", None), a.play)
+
     ap = argparse.ArgumentParser(description="Podcam: camara del celular para el PC")
     ap.add_argument("--port", type=int, default=8080, help="HTTP (visor/OBS y USB)")
     ap.add_argument("--https-port", type=int, default=8443, help="HTTPS (celular por WiFi)")

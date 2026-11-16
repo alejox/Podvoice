@@ -3,12 +3,46 @@
 Usa la camara y el microfono del celular como fuente de video en el PC (estilo DroidCam),
 por WiFi o USB, en **Windows, macOS y Linux**, sin instalar drivers y sin cuenta de Apple Developer.
 
-- **PC:** un script de Python (solo libreria estandar) que sirve dos paginas y coordina la conexion.
-- **Celular (Android o iPhone):** se abre una pagina en el navegador; no hay app que instalar.
-- **Video/audio:** WebRTC directo celular → PC (H.264/VP8 + Opus, baja latencia, red local).
+- **Celular:** app Android nativa, o una pagina web (Android o iPhone) sin instalar nada.
+- **PC:** `podcam.py` (Python, solo libreria estandar) para la pagina web y para conectar la app por USB.
 - **Webcam virtual:** se usa la **Camara Virtual de OBS**, que ya esta firmada en los tres sistemas.
 
-## Uso
+Hay dos formas de usar el celular:
+
+| | App Android nativa (recomendada) | Pagina web (Android o iPhone) |
+|---|---|---|
+| Instalar en el celular | APK `dist/Podcam-0.1.0-debug.apk` | nada, se abre en el navegador |
+| USB | solo el cable (`adb forward`), sin WiFi | necesita WiFi o anclaje USB |
+| Pantalla apagada / otra app | si (servicio en primer plano) | no |
+| En el PC | OBS lo abre directo (Fuente multimedia) | `podcam.py` + Fuente de navegador |
+
+## App Android nativa
+
+Camara → H.264 por hardware, microfono → AAC 48 kHz, empaquetado en MPEG-TS y servido por TCP
+en el puerto **4747** del celular. OBS, VLC y ffmpeg lo leen sin nada extra.
+
+**Instalar:** copia `dist/Podcam-0.1.0-debug.apk` al celular y abrelo (permite *Instalar apps desconocidas*),
+o `adb install dist/Podcam-0.1.0-debug.apk`. Acepta los permisos de camara, microfono y notificaciones.
+Requiere Android 8.0 o superior. La app se usa en horizontal.
+
+**Conectar por USB (sin WiFi):**
+1. Activa *Opciones de desarrollador › Depuracion USB* y conecta el cable (acepta el aviso del celular).
+2. Instala [Platform-Tools](https://developer.android.com/tools/releases/platform-tools) (trae `adb`).
+3. En la app pulsa **Iniciar**. En el PC: `python3 podcam.py usb`
+   (equivale a `adb forward tcp:4747 tcp:4747`; con `--play` lo abre en ffplay).
+4. En OBS: **Fuente › Fuente multimedia**, desmarca *Archivo local*, entrada `tcp://127.0.0.1:4747`,
+   formato de entrada `mpegts`. Luego **Iniciar camara virtual**.
+
+**Conectar por WiFi:** misma red; en OBS usa la URL `tcp://<IP-del-celular>:4747` que muestra la app
+(o `python3 podcam.py wifi <IP> --play`).
+
+En la app eliges camara trasera/frontal, 1080p/720p/480p, 4-16 Mbps y microfono si/no; los cambios se aplican
+sin desconectar el PC. Sigue transmitiendo con la pantalla apagada (notificacion con boton *Detener*).
+
+**Compilar:** `cd android && ./gradlew assembleDebug` (necesita el Android SDK con `sdk.dir` en `local.properties`
+o `ANDROID_HOME`). Para publicar en Google Play: crea tu propia clave de firma y genera `bundleRelease`.
+
+## Pagina web (sin instalar app)
 
 1. Instala Python 3.8+ y [OBS Studio](https://obsproject.com) en el PC.
 2. Ejecuta `python3 podcam.py` (en Windows: `py podcam.py`).
@@ -32,7 +66,7 @@ Para solo mirar o grabar, basta abrir `http://localhost:8080/viewer` en el naveg
   (la extension de camara de OBS ya va firmada y notarizada por OBS).
 - Ninguna parte del proyecto instala extensiones del sistema.
 
-## Nota sobre USB
+## Nota sobre USB (solo pagina web)
 
 `adb reverse` lleva por el cable la pagina y la senalizacion (TCP). El video WebRTC va por UDP, asi que el
 celular y el PC necesitan una red en comun:
@@ -43,8 +77,10 @@ celular y el PC necesitan una red en comun:
 
 ## Limitaciones
 
-- Un celular y un visor a la vez.
-- Mantener la pantalla del celular encendida y el navegador en primer plano (se pide *wake lock*).
+- Pagina web: un celular y un visor a la vez; mantener la pantalla encendida y el navegador en primer plano.
 - En Windows, `openssl` viene con Git for Windows; sin `openssl` no hay HTTPS y solo funciona el modo USB.
-- Probado de extremo a extremo con Chromium y camara simulada en Linux. Falta probarlo con
-  celulares reales, con OBS y en Windows/macOS.
+- Pagina web: probada de extremo a extremo con Chromium y camara simulada en Linux.
+- App nativa: compila y pasa lint; el empaquetado MPEG-TS y el servidor TCP se probaron con ffmpeg
+  (video y audio decodifican sin errores, un cliente que entra a mitad arranca en un keyframe).
+  Camara, microfono y servicio no se pudieron probar aqui: falta probar en un celular real y con OBS.
+- La imagen sale en horizontal segun el sensor; si en algun modelo sale girada, avisa.
